@@ -1,119 +1,93 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-type Feature = "ecommerce" | "blockchain" | "staking";
-
-type Props = {
-  active: Feature;
+type ChainMarketHeaderProps = {
   search: string;
-  onSearchChange?: (value: string) => void;
+  onSearchChange: (value: string) => void;
   searchPlaceholder?: string;
+  mobileSearchPlaceholder?: string;
+  darkMode: boolean;
+  onToggleTheme: () => void;
+  userEmail: string | null;
+  showCart?: boolean;
   cartCount?: number;
   onCartClick?: () => void;
+  onLogoClick?: () => void;
 };
 
 export default function ChainMarketHeader({
-  active,
   search,
   onSearchChange,
   searchPlaceholder = "Search products, categories, sellers...",
+  mobileSearchPlaceholder = "Search products...",
+  darkMode,
+  onToggleTheme,
+  userEmail,
+  showCart = true,
   cartCount = 0,
   onCartClick,
-}: Props) {
-  const [darkMode, setDarkMode] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("chain-market-theme");
-
-    if (savedTheme === "dark") {
-      setDarkMode(true);
-    } else if (savedTheme === "light") {
-      setDarkMode(false);
-    } else {
-      setDarkMode(
-        window.matchMedia("(prefers-color-scheme: dark)").matches
-      );
-    }
-
-    const email = localStorage.getItem("chain-market-user-email");
-
-    if (email) {
-      setUserEmail(email);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "chain-market-theme",
-      darkMode ? "dark" : "light"
-    );
-  }, [darkMode]);
-
+  onLogoClick,
+}: ChainMarketHeaderProps) {
   const theme = darkMode
     ? {
-        header: "border-slate-800 bg-slate-950/95 text-white",
-        input: "border-slate-700 bg-slate-900",
-        muted: "text-slate-400",
-        soft: "bg-slate-900",
-        softHover: "hover:bg-slate-800",
+        header: "bg-[#09090b]/95 border-zinc-800",
+        topbar: "bg-zinc-950 border-zinc-800",
+        input:
+          "bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500",
+        muted: "text-zinc-400",
+        soft: "bg-zinc-900",
+        softHover: "hover:bg-zinc-800",
       }
     : {
-        header: "border-slate-200 bg-white/95 text-slate-900",
-        input: "border-slate-200 bg-slate-50",
-        muted: "text-slate-500",
-        soft: "bg-slate-100",
-        softHover: "hover:bg-slate-100",
+        header: "bg-white/95 border-zinc-200",
+        topbar: "bg-white border-zinc-200",
+        input:
+          "bg-zinc-50 border-zinc-200 text-zinc-900 placeholder:text-zinc-400",
+        muted: "text-zinc-500",
+        soft: "bg-zinc-100",
+        softHover: "hover:bg-zinc-200",
       };
-
-  const navClass = (feature: Feature) =>
-    `rounded-xl px-3 py-2 text-sm font-semibold ${
-      active === feature
-        ? "bg-blue-600 text-white"
-        : theme.softHover
-    }`;
 
   return (
     <>
       {/* TOP BAR */}
-      <div
-        className={`hidden border-b md:block ${
-          darkMode
-            ? "border-slate-800 bg-slate-950 text-slate-300"
-            : "border-slate-200 bg-white text-slate-600"
-        }`}
-      >
-        <div className="mx-auto flex h-10 max-w-7xl items-center justify-between px-4 text-xs sm:px-6">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-blue-600">
+      <div className={`border-b text-xs ${theme.topbar}`}>
+        <div className="mx-auto flex h-9 max-w-7xl items-center justify-between px-6">
+          <div className="flex items-center gap-5">
+            <button className="font-medium hover:text-blue-600">
               Seller Center
-            </span>
+            </button>
 
-            <span>Mulai berjualan di ChainMarket</span>
+            <button
+              className={`hidden sm:block ${theme.muted} hover:text-blue-600`}
+            >
+              Mulai Berjualan
+            </button>
           </div>
 
-          <div className="flex items-center gap-5">
-            <span className="cursor-pointer hover:text-blue-600">
+          <div className="flex items-center gap-4">
+            <button className={`${theme.muted} hover:text-blue-600`}>
               Bantuan
-            </span>
+            </button>
 
-            <span className="cursor-pointer hover:text-blue-600">
+            <button className={`${theme.muted} hover:text-blue-600`}>
               Bahasa
-            </span>
+            </button>
+
+            <span className={theme.muted}>|</span>
 
             {userEmail ? (
               <Link
                 href="/account"
-                className="max-w-[220px] truncate font-semibold hover:text-blue-600"
+                className="font-semibold hover:text-blue-600"
               >
                 {userEmail}
               </Link>
             ) : (
               <Link
                 href="/login"
-                className="font-semibold text-blue-600 hover:text-blue-700"
+                className="font-semibold hover:text-blue-600"
               >
                 Login / Register
               </Link>
@@ -124,55 +98,71 @@ export default function ChainMarketHeader({
 
       {/* MAIN HEADER */}
       <header
-        className={`sticky top-0 z-50 border-b backdrop-blur-xl ${theme.header}`}
+        className={`sticky top-0 z-50 border-b backdrop-blur-xl transition-colors ${theme.header}`}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
-          <Link
-            href="/"
-            className="shrink-0 text-xl font-black tracking-tight sm:text-2xl"
-          >
-            Chain<span className="text-blue-600">Market</span>
-          </Link>
+        <div className="mx-auto flex min-h-[72px] max-w-7xl items-center gap-4 px-6">
+          {/* LOGO */}
+          {onLogoClick ? (
+            <button
+              onClick={onLogoClick}
+              className="shrink-0 text-2xl font-black tracking-tight"
+            >
+              Chain<span className="text-blue-600">Market</span>
+            </button>
+          ) : (
+            <Link
+              href="/"
+              className="shrink-0 text-2xl font-black tracking-tight"
+            >
+              Chain<span className="text-blue-600">Market</span>
+            </Link>
+          )}
 
           {/* SEARCH */}
-          <div className="hidden min-w-0 flex-1 md:block">
+          <div className="hidden flex-1 md:block">
             <div
-              className={`mx-auto flex max-w-2xl items-center rounded-xl border px-4 ${theme.input}`}
+              className={`mx-auto flex max-w-2xl items-center rounded-xl border px-4 transition-all focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 ${theme.input}`}
             >
-              <span className={`mr-3 text-lg ${theme.muted}`}>
-                ⌕
-              </span>
+              <span className={`mr-3 text-lg ${theme.muted}`}>⌕</span>
 
               <input
                 value={search}
-                onChange={(event) =>
-                  onSearchChange?.(event.target.value)
-                }
-                className="w-full bg-transparent py-2.5 text-sm outline-none"
+                onChange={(event) => onSearchChange(event.target.value)}
+                className="w-full bg-transparent py-3 text-sm outline-none"
                 placeholder={searchPlaceholder}
               />
+
+              {search && (
+                <button
+                  onClick={() => onSearchChange("")}
+                  className={theme.muted}
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
             </div>
           </div>
 
-          {/* NAV */}
+          {/* MAIN NAVIGATION */}
           <nav className="hidden items-center gap-1 lg:flex">
             <Link
               href="/"
-              className={navClass("ecommerce")}
+              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
             >
               Ecommerce
             </Link>
 
             <Link
               href="/blockchain"
-              className={navClass("blockchain")}
+              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
             >
               Blockchain
             </Link>
 
             <Link
               href="/staking"
-              className={navClass("staking")}
+              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
             >
               Staking
             </Link>
@@ -185,71 +175,73 @@ export default function ChainMarketHeader({
             </Link>
           </nav>
 
-          {/* ACCOUNT */}
+          {/* CART */}
+          {showCart && (
+            <button
+              onClick={onCartClick}
+              className={`relative rounded-xl p-2.5 text-xl transition-colors ${theme.softHover}`}
+              aria-label="Open cart"
+            >
+              🛒
+
+              {cartCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          )}
+
+          {/* DARK MODE */}
+          <button
+            onClick={onToggleTheme}
+            className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg transition-colors ${theme.soft} ${theme.softHover}`}
+            aria-label="Toggle theme"
+          >
+            {darkMode ? "☀️" : "🌙"}
+          </button>
+
+          {/* ACCOUNT / LOGIN */}
           {userEmail ? (
             <Link
               href="/account"
-              className={`hidden rounded-xl px-3 py-2 text-sm font-semibold sm:block ${theme.soft}`}
+              className="hidden rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:block"
             >
               Account
             </Link>
           ) : (
             <Link
               href="/login"
-              className="hidden text-sm font-semibold text-blue-600 sm:block"
+              className="hidden rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:block"
             >
               Login
             </Link>
           )}
-
-          {/* CART */}
-          <button
-            onClick={onCartClick}
-            className={`relative rounded-xl p-2 text-xl transition-colors ${theme.softHover}`}
-            aria-label="Open cart"
-          >
-            🛒
-
-            {cartCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
-                {cartCount}
-              </span>
-            )}
-          </button>
-
-          {/* DARK MODE */}
-          <button
-            onClick={() => setDarkMode((value) => !value)}
-            className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg transition-colors ${theme.soft}`}
-            aria-label="Toggle theme"
-          >
-            {darkMode ? "☀️" : "🌙"}
-          </button>
         </div>
 
         {/* MOBILE SEARCH */}
-        <div
-          className={`border-t px-4 py-2 md:hidden ${
-            darkMode
-              ? "border-slate-800"
-              : "border-slate-200"
-          }`}
-        >
+        <div className="border-t px-6 py-3 md:hidden">
           <div
             className={`flex items-center rounded-xl border px-4 ${theme.input}`}
           >
-            <span className={`mr-3 ${theme.muted}`}>
-              ⌕
-            </span>
+            <span className={`mr-3 ${theme.muted}`}>⌕</span>
 
             <input
               value={search}
-              onChange={(event) =>
-                onSearchChange?.(event.target.value)
-              }
+              onChange={(event) => onSearchChange(event.target.value)}
               className="w-full bg-transparent py-2 text-sm outline-none"
-              placeholder={searchPlaceholder}
+              placeholder={mobileSearchPlaceholder}
             />
+
+            {search && (
+              <button
+                onClick={() => onSearchChange("")}
+                className={theme.muted}
+                aria-label="Clear search"
+              >
+                ×
+              </button>
+            )}
           </div>
         </div>
       </header>

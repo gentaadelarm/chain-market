@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import ChainMarketHeader from "@/components/ChainMarketHeader";
 
 type Product = {
   id: number;
@@ -414,171 +415,24 @@ export default function Home() {
     <main
       className={`min-h-screen transition-colors duration-300 ${theme.page}`}
     >
-      {/* TOP BAR */}
-      <div
-        className={`hidden border-b text-xs sm:block ${theme.border}`}
-      >
-        <div className="mx-auto flex h-9 max-w-7xl items-center justify-between px-6">
-          <div className="flex items-center gap-5">
-            <Link
-              href="/account"
-              className="font-medium hover:text-blue-600"
-            >
-              Seller Center
-            </Link>
-            <span className={theme.muted}>
-              Mulai berjualan di ChainMarket
-            </span>
-          </div>
-
-          <div className="flex items-center gap-5">
-            <span className="cursor-pointer hover:text-blue-600">
-              Bantuan
-            </span>
-            <span className="cursor-pointer hover:text-blue-600">
-              Bahasa
-            </span>
-
-            {userEmail ? (
-              <Link
-                href="/account"
-                className="max-w-[220px] truncate font-semibold hover:text-blue-600"
-              >
-                {userEmail}
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="font-semibold text-blue-600 hover:text-blue-700"
-              >
-                Login / Register
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* MAIN HEADER */}
-      <header
-        className={`sticky top-0 z-50 border-b backdrop-blur-xl ${theme.header}`}
-      >
-        <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
-          <button
-            onClick={() => {
-              setSelectedProduct(null);
-              setShowStore(false);
-              setShowCart(false);
-            }}
-            className="shrink-0 text-xl font-black tracking-tight sm:text-2xl"
-          >
-            Chain<span className="text-blue-600">Market</span>
-          </button>
-
-          <div className="hidden min-w-0 flex-1 md:block">
-            <div
-              className={`mx-auto flex max-w-2xl items-center rounded-xl border px-4 ${theme.input}`}
-            >
-              <span className={`mr-3 text-lg ${theme.muted}`}>
-                ⌕
-              </span>
-
-              <input
-                value={search}
-                onChange={(event) =>
-                  setSearch(event.target.value)
-                }
-                className="w-full bg-transparent py-2.5 text-sm outline-none"
-                placeholder="Search products, categories, sellers..."
-              />
-            </div>
-          </div>
-
-          <nav className="hidden items-center gap-1 lg:flex">
-            <Link
-              href="/"
-              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
-            >
-              Ecommerce
-            </Link>
-
-            <Link
-              href="/blockchain"
-              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
-            >
-              Blockchain
-            </Link>
-
-            <Link
-              href="/staking"
-              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
-            >
-              Staking
-            </Link>
-
-            <a
-              href="#products"
-              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
-            >
-              Categories
-            </a>
-          </nav>
-
-          {userEmail ? (
-            <Link
-              href="/account"
-              className={`hidden rounded-xl px-3 py-2 text-sm font-semibold sm:block ${theme.soft}`}
-            >
-              Account
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className="hidden text-sm font-semibold text-blue-600 sm:block"
-            >
-              Login
-            </Link>
-          )}
-
-          <button
-            onClick={() => setShowCart(true)}
-            className={`relative rounded-xl p-2 text-xl transition-colors ${theme.softHover}`}
-            aria-label="Open cart"
-          >
-            🛒
-
-            {cartCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
-                {cartCount}
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setDarkMode((value) => !value)}
-            className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg transition-colors ${theme.soft}`}
-            aria-label="Toggle theme"
-          >
-            {darkMode ? "☀️" : "🌙"}
-          </button>
-        </div>
-
-        <div className="border-t px-4 py-2 md:hidden">
-          <div
-            className={`flex items-center rounded-xl border px-4 ${theme.input}`}
-          >
-            <span className={`mr-3 ${theme.muted}`}>⌕</span>
-
-            <input
-              value={search}
-              onChange={(event) =>
-                setSearch(event.target.value)
-              }
-              className="w-full bg-transparent py-2 text-sm outline-none"
-              placeholder="Search products..."
-            />
-          </div>
-        </div>
-      </header>
+<ChainMarketHeader
+  search={search}
+  onSearchChange={setSearch}
+  searchPlaceholder="Search products, categories, sellers..."
+  mobileSearchPlaceholder="Search products..."
+  darkMode={darkMode}
+  onToggleTheme={() => setDarkMode((value) => !value)}
+  userEmail={userEmail}
+  showCart
+  cartCount={cartCount}
+  onCartClick={() => setShowCart(true)}
+  onLogoClick={() => {
+    setSelectedProduct(null);
+    setShowStore(false);
+    setShowCart(false);
+    setSearch("");
+  }}
+/>
 
       {/* PRODUCT DETAIL */}
       {selectedProduct ? (
