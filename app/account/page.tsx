@@ -405,7 +405,11 @@ export default function AccountPage() {
   }
 
   const positiveBalances = walletBalances.filter(
-    (item) => item.asset && Number(item.balance) > 0
+    (item) =>
+      item.asset &&
+      Number(item.balance) > 0 &&
+      Number.isFinite(Number(item.value_usd)) &&
+      Number(item.value_usd) > 0
   );
 
   return (

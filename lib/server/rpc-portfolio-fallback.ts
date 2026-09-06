@@ -1,6 +1,10 @@
 type FallbackNetwork =
+  | "eth-mainnet"
   | "bnb-mainnet"
   | "base-mainnet"
+  | "arb-mainnet"
+  | "opt-mainnet"
+  | "matic-mainnet"
   | "sol-mainnet";
 
 export type RpcFallbackToken = {
@@ -91,6 +95,33 @@ async function rpc<T>(
   }
 }
 
+function nativeMeta(
+  network: Exclude<FallbackNetwork, "sol-mainnet">
+) {
+  switch (network) {
+    case "bnb-mainnet":
+      return {
+        decimals: 18,
+        symbol: "BNB",
+        name: "BNB Smart Chain",
+      };
+
+    case "matic-mainnet":
+      return {
+        decimals: 18,
+        symbol: "POL",
+        name: "Polygon",
+      };
+
+    default:
+      return {
+        decimals: 18,
+        symbol: "ETH",
+        name: "Ethereum",
+      };
+  }
+}
+
 function topicAddress(address: string) {
   return `0x${address
     .replace(/^0x/, "")
@@ -162,7 +193,7 @@ function decodeString(hex?: string): string | null {
 
 async function nativeToken(
   address: string,
-  network: "bnb-mainnet" | "base-mainnet",
+  network: Exclude<FallbackNetwork, "sol-mainnet">,
   rpcUrl: string
 ): Promise<RpcFallbackToken | null> {
   try {
@@ -208,7 +239,7 @@ async function nativeToken(
 
 async function discoverErc20(
   address: string,
-  network: "bnb-mainnet" | "base-mainnet",
+  network: Exclude<FallbackNetwork, "sol-mainnet">,
   rpcUrl: string
 ): Promise<RpcFallbackToken[]> {
   const blockHex = await rpc<string>(
@@ -547,16 +578,43 @@ export async function scanRpcFallback({
   const result: RpcFallbackToken[] = [];
 
   if (evmAddress) {
-    const targets = [
+    const targets: Array<{
+      network: Exclude<FallbackNetwork, "sol-mainnet">;
+      rpcUrl?: string;
+    }> = [
       {
-        network: "bnb-mainnet" as const,
+        network: "eth-mainnet",
+        rpcUrl:
+          process.env.ETHEREUM_RPC_URL?.trim() ||
+          "https://cloudflare-eth.com",
+      },
+      {
+        network: "bnb-mainnet",
         rpcUrl:
           process.env.BSC_RPC_URL?.trim(),
       },
       {
-        network: "base-mainnet" as const,
+        network: "base-mainnet",
         rpcUrl:
           process.env.BASE_RPC_URL?.trim(),
+      },
+      {
+        network: "arb-mainnet",
+        rpcUrl:
+          process.env.ARBITRUM_RPC_URL?.trim() ||
+          "https://arb1.arbitrum.io/rpc",
+      },
+      {
+        network: "opt-mainnet",
+        rpcUrl:
+          process.env.OPTIMISM_RPC_URL?.trim() ||
+          "https://mainnet.optimism.io",
+      },
+      {
+        network: "matic-mainnet",
+        rpcUrl:
+          process.env.POLYGON_RPC_URL?.trim() ||
+          "https://polygon-rpc.com",
       },
     ];
 
@@ -625,7 +683,13 @@ export async function getRpcFallbackPrice(
           ? "bsc"
           : network === "base-mainnet"
             ? "base"
-            : "solana";
+            : network === "matic-mainnet"
+              ? "polygon"
+              : network === "arb-mainnet"
+                ? "arbitrum"
+                : network === "opt-mainnet"
+                  ? "optimism"
+                  : "ethereum";
 
       const response = await fetch(
         `https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`,
@@ -705,7 +769,9 @@ export async function getRpcFallbackPrice(
     const id =
       network === "sol-mainnet"
         ? "solana"
-        : "ethereum";
+        : network === "matic-mainnet"
+          ? "matic-network"
+          : "ethereum";
 
     const response = await fetch(
       `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`,

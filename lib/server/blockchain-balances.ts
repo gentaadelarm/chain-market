@@ -864,8 +864,12 @@ export async function scanWalletPortfolio({
 
     if (priceUsd == null) {
       if (
+        token.network === "eth-mainnet" ||
         token.network === "bnb-mainnet" ||
         token.network === "base-mainnet" ||
+        token.network === "arb-mainnet" ||
+        token.network === "opt-mainnet" ||
+        token.network === "matic-mainnet" ||
         token.network === "sol-mainnet"
       ) {
         priceUsd = await getRpcFallbackPrice(
@@ -888,13 +892,20 @@ export async function scanWalletPortfolio({
       }
     }
 
-    if (priceUsd == null) {
-      priceUsd = 0;
+    if (
+      priceUsd == null ||
+      !Number.isFinite(priceUsd) ||
+      priceUsd <= 0
+    ) {
+      continue;
     }
 
     const valueUsd = balanceNumber * priceUsd;
 
-    if (!Number.isFinite(valueUsd)) {
+    if (
+      !Number.isFinite(valueUsd) ||
+      valueUsd <= 0
+    ) {
       continue;
     }
 
