@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type Product = {
   id: number;
@@ -164,7 +165,7 @@ export default function CheckoutPage() {
 
           {/* HEADER */}
           <header className="flex items-center justify-between">
-            <a
+            <Link
               href="/"
               className={`text-sm transition ${
                 isDark
@@ -173,7 +174,7 @@ export default function CheckoutPage() {
               }`}
             >
               ← Back to Shop
-            </a>
+            </Link>
 
             <button
               onClick={toggleTheme}
@@ -210,16 +211,16 @@ export default function CheckoutPage() {
                   : "text-gray-500"
               }`}
             >
-              Looks like you haven't added
+              Looks like you haven&apos;t added
               anything to your cart yet.
             </p>
 
-            <a
+            <Link
               href="/"
               className="mt-8 inline-flex rounded-2xl bg-black px-7 py-3.5 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:opacity-80 dark:bg-white dark:text-black"
             >
               Continue Shopping
-            </a>
+            </Link>
 
           </div>
         </div>
@@ -270,7 +271,7 @@ export default function CheckoutPage() {
         {/* HEADER */}
         <header className="flex items-center justify-between">
 
-          <a
+          <Link
             href="/"
             className={`text-sm font-medium transition ${
               isDark
@@ -279,7 +280,7 @@ export default function CheckoutPage() {
             }`}
           >
             ← Back to Shop
-          </a>
+          </Link>
 
           <div className="flex items-center gap-3">
 

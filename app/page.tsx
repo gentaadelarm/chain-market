@@ -1,206 +1,21 @@
 "use client";
 
+
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import ChainMarketHeader from "@/components/ChainMarketHeader";
+import { useTheme } from "@/components/ThemeProvider";
+import { products, type Product } from "@/lib/products";
 
-type Product = {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  seller: string;
-  emoji: string;
-  description: string;
-  rating: number;
-  reviews: number;
-  stock: number;
-  sold: number;
-  colors: string[];
-  models: string[];
-  sellerRating: number;
-  sellerProducts: number;
-  sellerResponse: number;
-  sellerJoined: string;
-  sellerFollowers: number;
-};
+
 
 type CartItem = {
   product: Product;
   quantity: number;
 };
 
-const products: Product[] = [
-  {
-    id: 1,
-    name: "Wireless Headphones",
-    category: "Electronics",
-    price: 49.99,
-    seller: "TechStore",
-    emoji: "🎧",
-    description:
-      "Premium wireless headphones with immersive sound, comfortable ear cushions, and long-lasting battery life.",
-    rating: 4.8,
-    reviews: 124,
-    stock: 25,
-    sold: 842,
-    colors: ["Black", "White", "Blue"],
-    models: ["Standard", "Pro"],
-    sellerRating: 4.9,
-    sellerProducts: 128,
-    sellerResponse: 98,
-    sellerJoined: "March 2025",
-    sellerFollowers: 1240,
-  },
-  {
-    id: 2,
-    name: "Mechanical Keyboard",
-    category: "Electronics",
-    price: 79.99,
-    seller: "KeyHouse",
-    emoji: "⌨️",
-    description:
-      "A premium mechanical keyboard built for gaming, programming, and everyday productivity.",
-    rating: 4.9,
-    reviews: 89,
-    stock: 18,
-    sold: 534,
-    colors: ["Black", "White"],
-    models: ["Blue Switch", "Red Switch", "Brown Switch"],
-    sellerRating: 4.9,
-    sellerProducts: 86,
-    sellerResponse: 99,
-    sellerJoined: "January 2025",
-    sellerFollowers: 892,
-  },
-  {
-    id: 3,
-    name: "Premium Backpack",
-    category: "Fashion",
-    price: 39.99,
-    seller: "UrbanGoods",
-    emoji: "🎒",
-    description:
-      "Minimalist everyday backpack with multiple compartments and durable water-resistant material.",
-    rating: 4.7,
-    reviews: 67,
-    stock: 32,
-    sold: 713,
-    colors: ["Black", "Gray", "Green"],
-    models: ["20L", "30L"],
-    sellerRating: 4.8,
-    sellerProducts: 214,
-    sellerResponse: 96,
-    sellerJoined: "June 2024",
-    sellerFollowers: 2100,
-  },
-  {
-    id: 4,
-    name: "Smart Watch",
-    category: "Electronics",
-    price: 129.99,
-    seller: "FutureTech",
-    emoji: "⌚",
-    description:
-      "Modern smartwatch with fitness tracking, notifications, health metrics, and a vibrant display.",
-    rating: 4.6,
-    reviews: 203,
-    stock: 12,
-    sold: 1208,
-    colors: ["Black", "Silver"],
-    models: ["40mm", "44mm"],
-    sellerRating: 4.7,
-    sellerProducts: 175,
-    sellerResponse: 97,
-    sellerJoined: "September 2024",
-    sellerFollowers: 3400,
-  },
-  {
-    id: 5,
-    name: "Running Shoes",
-    category: "Sports",
-    price: 69.99,
-    seller: "SportZone",
-    emoji: "👟",
-    description:
-      "Lightweight running shoes designed for comfort, stability, and everyday training.",
-    rating: 4.8,
-    reviews: 156,
-    stock: 40,
-    sold: 935,
-    colors: ["Black", "White", "Red"],
-    models: ["40", "41", "42", "43", "44"],
-    sellerRating: 4.8,
-    sellerProducts: 342,
-    sellerResponse: 98,
-    sellerJoined: "April 2024",
-    sellerFollowers: 2890,
-  },
-  {
-    id: 6,
-    name: "Gaming Mouse",
-    category: "Gaming",
-    price: 34.99,
-    seller: "GameHub",
-    emoji: "🖱️",
-    description:
-      "High-precision gaming mouse with adjustable DPI, ergonomic design, and programmable buttons.",
-    rating: 4.7,
-    reviews: 112,
-    stock: 28,
-    sold: 684,
-    colors: ["Black", "White"],
-    models: ["Wired", "Wireless"],
-    sellerRating: 4.9,
-    sellerProducts: 93,
-    sellerResponse: 99,
-    sellerJoined: "November 2024",
-    sellerFollowers: 1780,
-  },
-  {
-    id: 7,
-    name: "Minimalist Lamp",
-    category: "Home",
-    price: 29.99,
-    seller: "HomeSpace",
-    emoji: "💡",
-    description:
-      "Clean minimalist desk lamp that brings a warm and modern atmosphere to any room.",
-    rating: 4.5,
-    reviews: 54,
-    stock: 21,
-    sold: 421,
-    colors: ["White", "Black"],
-    models: ["Desk", "Bedside"],
-    sellerRating: 4.6,
-    sellerProducts: 157,
-    sellerResponse: 94,
-    sellerJoined: "August 2024",
-    sellerFollowers: 1260,
-  },
-  {
-    id: 8,
-    name: "Travel Camera",
-    category: "Electronics",
-    price: 299.99,
-    seller: "PhotoWorld",
-    emoji: "📷",
-    description:
-      "Compact travel camera designed for high-quality photos and videos wherever you go.",
-    rating: 4.9,
-    reviews: 76,
-    stock: 8,
-    sold: 317,
-    colors: ["Black", "Silver"],
-    models: ["Body Only", "18-55mm Kit"],
-    sellerRating: 4.9,
-    sellerProducts: 74,
-    sellerResponse: 99,
-    sellerJoined: "February 2024",
-    sellerFollowers: 4210,
-  },
-];
+
 
 const categories = [
   { name: "All", icon: "✨" },
@@ -212,9 +27,46 @@ const categories = [
 ];
 
 export default function Home() {
+  const { darkMode, toggleTheme } = useTheme();
+  const [promoIndex, setPromoIndex] = useState(0);
+  const [promoImages, setPromoImages] = useState<string[]>([]);
+
+  
+
+  useEffect(() => {
+    async function loadPromotions() {
+      try {
+        const response = await fetch("/api/promotions");
+
+        if (!response.ok) {
+          throw new Error("Failed to load promotions");
+        }
+
+        const data = await response.json();
+
+        setPromoImages(data.map((promo: { url: string }) => promo.url));
+        setPromoIndex(0);
+      } catch (error) {
+        console.error("Failed to load promotions:", error);
+        setPromoImages([]);
+      }
+    }
+
+    loadPromotions();
+  }, []);
+
+  useEffect(() => {
+    if (promoImages.length <= 1) return;
+
+    const timer = setInterval(() => {
+      setPromoIndex((current) => (current + 1) % promoImages.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [promoImages.length]);
+
   const supabase = createClient();
 
-  const [darkMode, setDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
@@ -226,20 +78,9 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [quantity, setQuantity] = useState(1);
   const [search, setSearch] = useState("");
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("chain-market-theme");
-
-    if (savedTheme === "dark") {
-      setDarkMode(true);
-    } else if (savedTheme === "light") {
-      setDarkMode(false);
-    } else {
-      setDarkMode(
-        window.matchMedia("(prefers-color-scheme: dark)").matches
-      );
-    }
-
     const savedCart = localStorage.getItem("chain-market-cart");
 
     if (savedCart) {
@@ -259,17 +100,30 @@ export default function Home() {
     };
 
     loadUser();
+
+    const savedSearchHistory = localStorage.getItem(
+      "chain-market-search-history"
+    );
+
+    if (savedSearchHistory) {
+      try {
+        const parsed = JSON.parse(savedSearchHistory);
+
+        if (Array.isArray(parsed)) {
+          setSearchHistory(
+            parsed.filter(
+              (item): item is string =>
+                typeof item === "string"
+            )
+          );
+        }
+      } catch {
+        setSearchHistory([]);
+      }
+    }
+
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    localStorage.setItem(
-      "chain-market-theme",
-      darkMode ? "dark" : "light"
-    );
-  }, [darkMode, mounted]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -279,6 +133,31 @@ export default function Home() {
       JSON.stringify(cart)
     );
   }, [cart, mounted]);
+
+
+  useEffect(() => {
+    if (!mounted || !search.trim()) return;
+
+    const timer = setTimeout(() => {
+      const query = search.trim().toLowerCase();
+
+      setSearchHistory((current) => {
+        const next = [
+          query,
+          ...current.filter((item) => item !== query),
+        ].slice(0, 10);
+
+        localStorage.setItem(
+          "chain-market-search-history",
+          JSON.stringify(next)
+        );
+
+        return next;
+      });
+    }, 700);
+
+    return () => clearTimeout(timer);
+  }, [search, mounted]);
 
   const filteredProducts = useMemo(() => {
     let result = products;
@@ -303,6 +182,71 @@ export default function Home() {
 
     return result;
   }, [selectedCategory, search]);
+
+
+  const bestSellingProducts = useMemo(() => {
+    return [...filteredProducts]
+      .sort((a, b) => b.sold - a.sold)
+      .slice(0, 8);
+  }, [filteredProducts]);
+
+  const recommendedProducts = useMemo(() => {
+    const activeSearch = search.trim().toLowerCase();
+
+    const terms = [
+      ...searchHistory,
+      activeSearch,
+    ]
+      .map((term) => term.trim().toLowerCase())
+      .filter(Boolean);
+
+    return [...products]
+      .map((product) => {
+        const searchableText = [
+          product.name,
+          product.category,
+          product.description,
+          product.seller,
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        let score = product.sold * 0.02;
+
+        if (
+          selectedCategory !== "All" &&
+          product.category === selectedCategory
+        ) {
+          score += 30;
+        }
+
+        for (const term of terms) {
+          if (product.name.toLowerCase().includes(term)) {
+            score += 50;
+          }
+
+          if (product.category.toLowerCase().includes(term)) {
+            score += 35;
+          }
+
+          if (product.seller.toLowerCase().includes(term)) {
+            score += 20;
+          }
+
+          if (searchableText.includes(term)) {
+            score += 10;
+          }
+        }
+
+        return {
+          product,
+          score,
+        };
+      })
+      .sort((a, b) => b.score - a.score)
+      .map((item) => item.product)
+      .slice(0, 8);
+  }, [search, searchHistory, selectedCategory]);
 
   const cartCount = cart.reduce(
     (total, item) => total + item.quantity,
@@ -421,7 +365,7 @@ export default function Home() {
   searchPlaceholder="Search products, categories, sellers..."
   mobileSearchPlaceholder="Search products..."
   darkMode={darkMode}
-  onToggleTheme={() => setDarkMode((value) => !value)}
+  onToggleTheme={toggleTheme}
   userEmail={userEmail}
   showCart
   cartCount={cartCount}
@@ -735,361 +679,320 @@ export default function Home() {
                   </button>
 
                   <Link
-                    href="/account"
+                    href="/seller/register"
                     className={`rounded-xl border px-6 py-3 font-semibold ${theme.card} ${theme.softHover}`}
                   >
                     Become a Seller
                   </Link>
                 </div>
               </div>
+              <div className="mt-10 flex flex-wrap items-center gap-7">
+                  <span className={`text-sm font-bold ${theme.muted}`}>
+                    Payment Support :
+                  </span>
 
-              <div className="mt-12 grid gap-3 sm:grid-cols-3">
-                {[
-                  {
-                    icon: "🟡",
-                    name: "BNB Smart Chain",
-                    token: "USDT · USDC",
-                  },
-                  {
-                    icon: "🔵",
-                    name: "Base",
-                    token: "USDC · USDT",
-                  },
-                  {
-                    icon: "🟣",
-                    name: "Solana",
-                    token: "USDC · USDT",
-                  },
-                ].map((network) => (
-                  <div
-                    key={network.name}
-                    className={`rounded-2xl border p-4 ${theme.card}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">
-                        {network.icon}
-                      </span>
-                      <div>
-                        <p className="text-sm font-bold">
-                          {network.name}
-                        </p>
-                        <p
-                          className={`mt-1 text-xs ${theme.muted}`}
-                        >
-                          {network.token}
-                        </p>
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <img
+                      src="/brands/solana.png"
+                      alt="Solana"
+                      className="h-7 w-7 object-contain"
+                    />
+                    <span className={`text-sm font-medium ${theme.muted}`}>
+                      Solana
+                    </span>
                   </div>
-                ))}
-              </div>
+
+                  <div className="flex items-center gap-2">
+                    <img
+                      src="/brands/bnb-chain.png"
+                      alt="BNB Smart Chain"
+                      className="h-7 w-7 object-contain"
+                    />
+                    <span className={`text-sm font-medium ${theme.muted}`}>
+                      BNB Smart Chain
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <img
+                      src="/brands/base.png"
+                      alt="Base"
+                      className="h-7 w-7 object-contain"
+                    />
+                    <span className={`text-sm font-medium ${theme.muted}`}>
+                      Base
+                    </span>
+                  </div>
+                </div>
+
             </div>
           </section>
 
-          {/* CATEGORY */}
-          <section className="mx-auto max-w-7xl px-6 pt-10">
-            <div className="mb-5">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">
-                Browse
-              </p>
-              <h2 className="mt-1 text-2xl font-black">
-                Shop by Category
-              </h2>
-            </div>
+           {/* PARTNER PROMOTIONS */}
+            <section className="mx-auto max-w-7xl px-6 py-12">
+              <div className="mb-6">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">
+                  
+                </p>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-              {categories.map((category) => (
-                <button
-                  key={category.name}
-                  onClick={() =>
-                    setSelectedCategory(category.name)
-                  }
-                  className={`rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 ${
-                    selectedCategory === category.name
-                      ? "border-blue-600 bg-blue-600 text-white"
-                      : `${theme.card} ${theme.softHover}`
+                <h2 className="mt-1 text-3xl font-black tracking-tight">
+                </h2>
+
+                <p className={`mt-2 text-sm ${theme.muted}`}>
+                </p>
+              </div>
+
+              {promoImages.length > 0 ? (
+                <div
+                  className={`relative overflow-hidden rounded-3xl border ${
+                    darkMode
+                      ? "border-zinc-800 bg-zinc-900"
+                      : "border-zinc-200 bg-zinc-100"
                   }`}
                 >
-                  <div className="text-2xl">
-                    {category.icon}
-                  </div>
-                  <p className="mt-3 text-sm font-semibold">
-                    {category.name}
-                  </p>
-                </button>
-              ))}
-            </div>
-          </section>
+                  <img
+                    src={promoImages[promoIndex]}
+                    alt={`Partner Promotion ${promoIndex + 1}`}
+                    className="block h-[300px] w-full object-cover transition-opacity duration-500"
+                  />
 
-          {/* CHAIN MARKET FEATURE CENTER */}
-          <section className="mx-auto max-w-7xl px-4 pb-10 pt-8 sm:px-6 lg:px-8">
-            <div className="mb-6">
-              <p className="text-sm font-bold uppercase tracking-wider text-blue-600">
-                ChainMarket Platform
-              </p>
+                  {promoImages.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPromoIndex(
+                            (promoIndex - 1 + promoImages.length) %
+                              promoImages.length
+                          )
+                        }
+                        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 px-4 py-3 text-xl text-white backdrop-blur hover:bg-black/70"
+                        aria-label="Previous promotion"
+                      >
+                        ←
+                      </button>
 
-              <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
-                Everything Web3, in one place.
-              </h1>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPromoIndex(
+                            (promoIndex + 1) % promoImages.length
+                          )
+                        }
+                        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 px-4 py-3 text-xl text-white backdrop-blur hover:bg-black/70"
+                        aria-label="Next promotion"
+                      >
+                        →
+                      </button>
 
-              <p className={`mt-2 max-w-2xl text-sm ${theme.muted}`}>
-                Shop products, explore crypto, and earn through staking
-                from one ChainMarket platform.
-              </p>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-3">
-
-              {/* ECOMMERCE */}
-              <Link
-                href="/"
-                className={`group rounded-3xl border p-6 transition-all hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-3xl">
-                    🛒
-                  </div>
-
-                  <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
-                    LIVE
-                  </span>
+                      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
+                        {promoImages.map((_, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => setPromoIndex(index)}
+                            className={`h-2.5 rounded-full transition ${
+                              index === promoIndex
+                                ? "w-6 bg-white"
+                                : "w-2.5 bg-white/50 hover:bg-white/80"
+                            }`}
+                            aria-label={`Go to promotion ${index + 1}`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
-
-                <h2 className="mt-6 text-2xl font-black">
-                  Ecommerce
-                </h2>
-
-                <p className={`mt-2 text-sm leading-6 ${theme.muted}`}>
-                  Buy products from sellers and pay with crypto through
-                  ChainMarket.
-                </p>
-
-                <div className="mt-6 text-sm font-bold text-blue-600 transition-transform group-hover:translate-x-1">
-                  Explore Marketplace →
+              ) : (
+                <div
+                  className={`flex h-[300px] items-center justify-center rounded-3xl border ${
+                    darkMode
+                      ? "border-zinc-800 bg-zinc-900 text-zinc-500"
+                      : "border-zinc-200 bg-zinc-100 text-zinc-400"
+                  }`}
+                >
+                  No partner promotions available.
                 </div>
-              </Link>
+              )}
+            </section>
 
-              {/* BLOCKCHAIN */}
-              <Link
-                href="/blockchain"
-                className={`group rounded-3xl border p-6 transition-all hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-3xl">
-                    ⛓️
-                  </div>
-
-                  <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-700">
-                    COMING SOON
-                  </span>
-                </div>
-
-                <h2 className="mt-6 text-2xl font-black">
-                  Blockchain
-                </h2>
-
-                <p className={`mt-2 text-sm leading-6 ${theme.muted}`}>
-                  Explore crypto tokens across BSC, Base, Solana and
-                  future supported networks.
-                </p>
-
-                <div className="mt-6 text-sm font-bold text-purple-600 transition-transform group-hover:translate-x-1">
-                  Explore Blockchain →
-                </div>
-              </Link>
-
-              {/* STAKING */}
-              <Link
-                href="/staking"
-                className={`group rounded-3xl border p-6 transition-all hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-3xl">
-                    💎
-                  </div>
-
-                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
-                    COMING SOON
-                  </span>
-                </div>
-
-                <h2 className="mt-6 text-2xl font-black">
-                  Staking
-                </h2>
-
-                <p className={`mt-2 text-sm leading-6 ${theme.muted}`}>
-                  Stake supported crypto assets and manage your rewards
-                  from one ChainMarket dashboard.
-                </p>
-
-                <div className="mt-6 text-sm font-bold text-emerald-600 transition-transform group-hover:translate-x-1">
-                  Explore Staking →
-                </div>
-              </Link>
-
-            </div>
-          </section>
-
-          {/* CHAIN MARKET FEATURE CENTER */}
-          <section className="mx-auto max-w-7xl px-4 pb-10 pt-8 sm:px-6 lg:px-8">
-            <div className="mb-6">
-              <p className="text-sm font-bold uppercase tracking-wider text-blue-600">
-                ChainMarket Platform
-              </p>
-
-              <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
-                Everything Web3, in one place.
-              </h1>
-
-              <p className={`mt-2 max-w-2xl text-sm ${theme.muted}`}>
-                Shop products, explore crypto, and earn through staking
-                from one ChainMarket platform.
-              </p>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-3">
-
-              {/* ECOMMERCE */}
-              <Link
-                href="/"
-                className={`group rounded-3xl border p-6 transition-all hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-3xl">
-                    🛒
-                  </div>
-
-                  <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
-                    LIVE
-                  </span>
-                </div>
-
-                <h2 className="mt-6 text-2xl font-black">
-                  Ecommerce
-                </h2>
-
-                <p className={`mt-2 text-sm leading-6 ${theme.muted}`}>
-                  Buy products from sellers and pay with crypto through
-                  ChainMarket.
-                </p>
-
-                <div className="mt-6 text-sm font-bold text-blue-600 transition-transform group-hover:translate-x-1">
-                  Explore Marketplace →
-                </div>
-              </Link>
-
-              {/* BLOCKCHAIN */}
-              <Link
-                href="/blockchain"
-                className={`group rounded-3xl border p-6 transition-all hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-3xl">
-                    ⛓️
-                  </div>
-
-                  <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-700">
-                    COMING SOON
-                  </span>
-                </div>
-
-                <h2 className="mt-6 text-2xl font-black">
-                  Blockchain
-                </h2>
-
-                <p className={`mt-2 text-sm leading-6 ${theme.muted}`}>
-                  Explore crypto tokens across BSC, Base, Solana and
-                  future supported networks.
-                </p>
-
-                <div className="mt-6 text-sm font-bold text-purple-600 transition-transform group-hover:translate-x-1">
-                  Explore Blockchain →
-                </div>
-              </Link>
-
-              {/* STAKING */}
-              <Link
-                href="/staking"
-                className={`group rounded-3xl border p-6 transition-all hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-3xl">
-                    💎
-                  </div>
-
-                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
-                    COMING SOON
-                  </span>
-                </div>
-
-                <h2 className="mt-6 text-2xl font-black">
-                  Staking
-                </h2>
-
-                <p className={`mt-2 text-sm leading-6 ${theme.muted}`}>
-                  Stake supported crypto assets and manage your rewards
-                  from one ChainMarket dashboard.
-                </p>
-
-                <div className="mt-6 text-sm font-bold text-emerald-600 transition-transform group-hover:translate-x-1">
-                  Explore Staking →
-                </div>
-              </Link>
-
-            </div>
-          </section>
-
-          {/* PRODUCTS */}
+          {/* CATEGORY */}
+          
+{/* PRODUCTS */}
           <section
             id="products"
             className="mx-auto max-w-7xl px-6 py-12"
           >
-            <div className="mb-7 flex items-end justify-between gap-4">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">
-                  Marketplace
-                </p>
-                <h2 className="mt-1 text-2xl font-black">
-                  Explore Products
-                </h2>
-                <p
-                  className={`mt-1 text-sm ${theme.muted}`}
-                >
-                  Popular products from ChainMarket sellers
-                </p>
+            {/* BEST SELLING */}
+            <div className="mb-10">
+              <div className="mb-6 flex items-end justify-between gap-4">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">
+                    Marketplace
+                  </p>
+
+                  <h2 className="mt-1 text-2xl font-black">
+                    🔥 Best Selling Products
+                  </h2>
+
+                  <p className={`mt-1 text-sm ${theme.muted}`}>
+                    Produk terlaris berdasarkan jumlah penjualan.
+                  </p>
+                </div>
+
+                <span className={`text-sm ${theme.muted}`}>
+                  {bestSellingProducts.length} products
+                </span>
               </div>
 
-              <span
-                className={`text-sm ${theme.muted}`}
-              >
-                {filteredProducts.length} products
-              </span>
+              {bestSellingProducts.length === 0 ? (
+                <div
+                  className={`rounded-2xl border p-12 text-center ${theme.card}`}
+                >
+                  <div className="text-4xl">📦</div>
+
+                  <h3 className="mt-4 font-bold">
+                    No products found
+                  </h3>
+
+                  <p className={`mt-2 text-sm ${theme.muted}`}>
+                    Try another search or category.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                  {bestSellingProducts.map((product) => (
+                    <article
+                      key={`best-${product.id}`}
+                      onClick={() => openProduct(product)}
+                      className={`group cursor-pointer overflow-hidden rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
+                    >
+                      <div
+                        className={`relative flex h-[200px] items-center justify-center text-6xl ${
+                          darkMode
+                            ? "bg-zinc-800 group-hover:bg-zinc-700"
+                            : "bg-zinc-100 group-hover:bg-zinc-200"
+                        }`}
+                      >
+                        {product.emoji}
+
+                        {product.stock <= 10 && (
+                          <span className="absolute left-3 top-3 rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white">
+                            Low Stock
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="p-4">
+                        <p className={`text-xs font-medium ${theme.muted}`}>
+                          {product.category}
+                        </p>
+
+                        <h3 className="mt-1 line-clamp-1 font-bold">
+                          {product.name}
+                        </h3>
+
+                        <p
+                          className={`mt-1 line-clamp-2 min-h-[32px] text-xs leading-4 ${theme.muted}`}
+                        >
+                          {product.description}
+                        </p>
+
+                        <div className="mt-3 flex items-center gap-1 text-xs">
+                          <span className="text-yellow-500">
+                            ★ {product.rating}
+                          </span>
+
+                          <span className={theme.muted}>
+                            ({product.reviews})
+                          </span>
+
+                          <span className={theme.muted}>
+                            · {product.sold} sold
+                          </span>
+                        </div>
+
+                        <div className="mt-2 flex items-center justify-between">
+                          <span className="text-lg font-black">
+                            ${product.price.toFixed(2)}
+                          </span>
+
+                          <span className={`text-xs ${theme.muted}`}>
+                            {product.stock} left
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            addToCart(product);
+                          }}
+                          className="mt-4 w-full rounded-xl bg-blue-600 px-3 py-2.5 text-xs font-bold text-white transition-colors hover:bg-blue-700"
+                        >
+                          Add to Cart
+                        </button>
+
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            openProduct(product);
+                          }}
+                          className={`mt-2 w-full rounded-xl border px-3 py-2.5 text-xs font-bold transition-colors ${
+                            darkMode
+                              ? "border-zinc-700 hover:bg-zinc-800"
+                              : "border-zinc-200 hover:bg-zinc-100"
+                          }`}
+                        >
+                          View Product
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-6 flex justify-end">
+                <Link
+                  href="/products?sort=best"
+                  className="rounded-xl border border-blue-600 px-5 py-3 text-sm font-bold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
+                >
+                  View All Best Sellers →
+                </Link>
+              </div>
             </div>
 
-            {filteredProducts.length === 0 ? (
-              <div
-                className={`rounded-2xl border p-12 text-center ${theme.card}`}
-              >
-                <div className="text-4xl">🔎</div>
-                <h3 className="mt-4 font-bold">
-                  No products found
-                </h3>
-                <p
-                  className={`mt-2 text-sm ${theme.muted}`}
-                >
-                  Try another search or category.
+            {/* RECOMMENDED */}
+            <div>
+              <div className="mb-6">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">
+                  Personalized
                 </p>
+
+                <h2 className="mt-1 text-2xl font-black">
+                  ✨ Recommended for You
+                </h2>
+
+                <p className={`mt-1 text-sm ${theme.muted}`}>
+                  Rekomendasi berdasarkan pencarian dan minat kamu.
+                </p>
+
+                {searchHistory.length > 0 && (
+                  <p className={`mt-2 text-xs ${theme.muted}`}>
+                    Based on your recent searches:{" "}
+                    {searchHistory.slice(0, 3).join(", ")}
+                  </p>
+                )}
               </div>
-            ) : (
+
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {filteredProducts.map((product) => (
+                {recommendedProducts.map((product) => (
                   <article
-                    key={product.id}
+                    key={`recommended-${product.id}`}
                     onClick={() => openProduct(product)}
                     className={`group cursor-pointer overflow-hidden rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
                   >
                     <div
-                      className={`relative flex aspect-square items-center justify-center text-7xl ${
+                      className={`relative flex h-[200px] items-center justify-center text-6xl ${
                         darkMode
                           ? "bg-zinc-800 group-hover:bg-zinc-700"
                           : "bg-zinc-100 group-hover:bg-zinc-200"
@@ -1105,9 +1008,7 @@ export default function Home() {
                     </div>
 
                     <div className="p-4">
-                      <p
-                        className={`text-xs font-medium ${theme.muted}`}
-                      >
+                      <p className={`text-xs font-medium ${theme.muted}`}>
                         {product.category}
                       </p>
 
@@ -1125,9 +1026,11 @@ export default function Home() {
                         <span className="text-yellow-500">
                           ★ {product.rating}
                         </span>
+
                         <span className={theme.muted}>
                           ({product.reviews})
                         </span>
+
                         <span className={theme.muted}>
                           · {product.sold} sold
                         </span>
@@ -1138,9 +1041,7 @@ export default function Home() {
                           ${product.price.toFixed(2)}
                         </span>
 
-                        <span
-                          className={`text-xs ${theme.muted}`}
-                        >
+                        <span className={`text-xs ${theme.muted}`}>
                           {product.stock} left
                         </span>
                       </div>
@@ -1160,7 +1061,11 @@ export default function Home() {
                           event.stopPropagation();
                           openProduct(product);
                         }}
-                        className={`mt-2 w-full rounded-xl border px-3 py-2.5 text-xs font-semibold ${theme.card} ${theme.softHover}`}
+                        className={`mt-2 w-full rounded-xl border px-3 py-2.5 text-xs font-bold transition-colors ${
+                          darkMode
+                            ? "border-zinc-700 hover:bg-zinc-800"
+                            : "border-zinc-200 hover:bg-zinc-100"
+                        }`}
                       >
                         View Product
                       </button>
@@ -1168,7 +1073,16 @@ export default function Home() {
                   </article>
                 ))}
               </div>
-            )}
+
+              <div className="mt-6 flex justify-end">
+                <Link
+                  href="/products?sort=recommended"
+                  className="rounded-xl border border-blue-600 px-5 py-3 text-sm font-bold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
+                >
+                  View More Recommendations →
+                </Link>
+              </div>
+            </div>
           </section>
 
           {/* CRYPTO / ESCROW */}

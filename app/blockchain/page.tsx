@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import ChainMarketHeader from "@/components/ChainMarketHeader";
 
 type Coin = {
   id: number;
@@ -169,159 +169,16 @@ export default function BlockchainPage() {
 
   return (
     <main className={`min-h-screen ${theme.page}`}>
-      {/* TOP BAR */}
-      <div className={`hidden border-b md:block ${theme.header}`}>
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 text-xs sm:px-6 lg:px-8">
-          <div className="flex items-center gap-5">
-            <Link
-              href="/account"
-              className={`font-semibold ${theme.softHover}`}
-            >
-              Seller Center
-            </Link>
-
-            <span className={theme.muted}>
-              Mulai berjualan di ChainMarket
-            </span>
-
-            <span className={theme.muted}>Bantuan</span>
-            <span className={theme.muted}>Bahasa</span>
-          </div>
-
-          {userEmail ? (
-            <Link
-              href="/account"
-              className="font-semibold text-blue-600 hover:text-blue-700"
-            >
-              {userEmail}
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className="font-semibold text-blue-600 hover:text-blue-700"
-            >
-              Login / Register
-            </Link>
-          )}
-        </div>
-      </div>
-
-      {/* MAIN HEADER */}
-      <header className={`border-b ${theme.header}`}>
-        <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            className="shrink-0 text-xl font-black tracking-tight sm:text-2xl"
-          >
-            Chain<span className="text-blue-600">Market</span>
-          </Link>
-
-          {/* SEARCH */}
-          <div className="hidden min-w-0 flex-1 md:block">
-            <div
-              className={`flex h-11 items-center rounded-xl border px-4 ${theme.input}`}
-            >
-              <span className="mr-3 text-lg">⌕</span>
-
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Cari coin atau token..."
-                className={`w-full bg-transparent text-sm outline-none ${
-                  darkMode
-                    ? "placeholder:text-slate-500"
-                    : "placeholder:text-slate-400"
-                }`}
-              />
-            </div>
-          </div>
-
-          {/* NAVIGATION */}
-          <nav className="hidden items-center gap-1 lg:flex">
-            <Link
-              href="/"
-              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
-            >
-              Ecommerce
-            </Link>
-
-            <Link
-              href="/blockchain"
-              className="rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white"
-            >
-              Blockchain
-            </Link>
-
-            <Link
-              href="/staking"
-              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
-            >
-              Staking
-            </Link>
-
-            <Link
-              href="/#products"
-              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
-            >
-              Categories
-            </Link>
-          </nav>
-
-          {/* CART */}
-          <Link
-            href="/"
-            className={`rounded-xl p-2.5 text-xl transition-colors ${theme.softHover}`}
-          >
-            🛒
-          </Link>
-
-          {/* DARK MODE */}
-          <button
-            onClick={() => setDarkMode((value) => !value)}
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg transition-colors ${
-              darkMode ? "bg-slate-900" : "bg-slate-100"
-            } ${theme.softHover}`}
-            aria-label="Toggle theme"
-          >
-            {darkMode ? "☀️" : "🌙"}
-          </button>
-
-          {/* ACCOUNT */}
-          {userEmail ? (
-            <Link
-              href="/account"
-              className="hidden rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:block"
-            >
-              Account
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className="hidden rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:block"
-            >
-              Login
-            </Link>
-          )}
-        </div>
-
-        {/* MOBILE SEARCH */}
-        <div className="border-t px-4 py-3 md:hidden">
-          <div
-            className={`flex h-11 items-center rounded-xl border px-4 ${theme.input}`}
-          >
-            <span className="mr-3 text-lg">⌕</span>
-
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari coin atau token..."
-              className="w-full bg-transparent text-sm outline-none"
-            />
-          </div>
-        </div>
-      </header>
+      <ChainMarketHeader
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Cari coin atau token..."
+        mobileSearchPlaceholder="Cari coin atau token..."
+        darkMode={darkMode}
+        onToggleTheme={() => setDarkMode((value) => !value)}
+        userEmail={userEmail}
+        showCart={false}
+      />
 
       {/* MARKET */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">

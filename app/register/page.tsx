@@ -24,6 +24,9 @@ export default function RegisterPage() {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: {
+          user_code: `CM-${crypto.randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase()}`,
+        },
       },
     });
 
@@ -170,7 +173,7 @@ export default function RegisterPage() {
             Already have an account?{" "}
             <a
               href="/login"
-              className="font-semibold text-black underline"
+              className="font-semibold text-white underline hover:text-gray-300"
             >
               Login
             </a>

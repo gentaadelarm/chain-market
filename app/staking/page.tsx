@@ -1,14 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import ChainMarketHeader from "@/components/ChainMarketHeader";
+import { useAuth } from "@/components/AuthProvider";
 
 export default function StakingPage() {
+  const { user } = useAuth();
   const [darkMode, setDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [search, setSearch] = useState("");
 
-  // Load theme yang sudah dipilih dari Ecommerce / Blockchain
+  // Load theme yang sudah dipilih dari Marketplace / Blockchain
   useEffect(() => {
     const savedTheme = localStorage.getItem("chain-market-theme");
 
@@ -102,164 +104,16 @@ export default function StakingPage() {
 
   return (
     <main className={`min-h-screen ${theme.page}`}>
-      {/* TOP BAR */}
-      <div className={`hidden border-b md:block ${theme.topbar}`}>
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 text-xs sm:px-6">
-          {/* SELLER CENTER */}
-          <Link
-            href="/account"
-            className="flex items-center gap-2 font-semibold hover:text-blue-600"
-          >
-            <span>Seller Center</span>
-
-            <span
-              className={`font-normal ${theme.muted}`}
-            >
-              Mulai berjualan di ChainMarket
-            </span>
-          </Link>
-
-          {/* TOP RIGHT */}
-          <div className="flex items-center gap-5">
-            <span className="cursor-pointer hover:text-blue-600">
-              Bantuan
-            </span>
-
-            <span className="cursor-pointer hover:text-blue-600">
-              Bahasa
-            </span>
-
-            <Link
-              href="/account"
-              className="max-w-[220px] truncate font-semibold hover:text-blue-600"
-            >
-              Account
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* MAIN HEADER */}
-      <header
-        className={`sticky top-0 z-50 border-b backdrop-blur-xl ${theme.header}`}
-      >
-        <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
-          {/* LOGO */}
-          <Link
-            href="/"
-            className="shrink-0 text-xl font-black tracking-tight sm:text-2xl"
-          >
-            Chain<span className="text-blue-600">Market</span>
-          </Link>
-
-          {/* SEARCH */}
-          <div className="hidden min-w-0 flex-1 md:block">
-            <div
-              className={`mx-auto flex max-w-2xl items-center rounded-xl border px-4 ${theme.input}`}
-            >
-              <span
-                className={`mr-3 text-lg ${theme.muted}`}
-              >
-                ⌕
-              </span>
-
-              <input
-                value={search}
-                onChange={(event) =>
-                  setSearch(event.target.value)
-                }
-                className="w-full bg-transparent py-2.5 text-sm outline-none"
-                placeholder="Search staking pools, assets..."
-              />
-            </div>
-          </div>
-
-          {/* NAVIGATION */}
-          <nav className="hidden items-center gap-1 lg:flex">
-            {/* ECOMMERCE */}
-            <Link
-              href="/"
-              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
-            >
-              Ecommerce
-            </Link>
-
-            {/* BLOCKCHAIN */}
-            <Link
-              href="/blockchain"
-              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
-            >
-              Blockchain
-            </Link>
-
-            {/* STAKING ACTIVE */}
-            <Link
-              href="/staking"
-              className="rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white"
-            >
-              Staking
-            </Link>
-
-            {/* CATEGORIES */}
-            <Link
-              href="/#categories"
-              className={`rounded-xl px-3 py-2 text-sm font-semibold ${theme.softHover}`}
-            >
-              Categories
-            </Link>
-          </nav>
-
-          {/* ACCOUNT */}
-          <Link
-            href="/account"
-            className={`hidden rounded-xl px-3 py-2 text-sm font-semibold sm:block ${theme.soft} ${theme.softHover}`}
-          >
-            Account
-          </Link>
-
-          {/* CART */}
-          <Link
-            href="/"
-            className={`relative rounded-xl p-2 text-xl transition-colors ${theme.softHover}`}
-            aria-label="Open Ecommerce"
-          >
-            🛒
-          </Link>
-
-          {/* DARK MODE */}
-          <button
-            onClick={() =>
-              setDarkMode((value) => !value)
-            }
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg transition-colors ${theme.soft} ${theme.softHover}`}
-            aria-label="Toggle theme"
-          >
-            {darkMode ? "☀️" : "🌙"}
-          </button>
-        </div>
-
-        {/* MOBILE SEARCH */}
-        <div className="border-t px-4 py-2 md:hidden">
-          <div
-            className={`flex items-center rounded-xl border px-4 ${theme.input}`}
-          >
-            <span
-              className={`mr-3 ${theme.muted}`}
-            >
-              ⌕
-            </span>
-
-            <input
-              value={search}
-              onChange={(event) =>
-                setSearch(event.target.value)
-              }
-              className="w-full bg-transparent py-2 text-sm outline-none"
-              placeholder="Search staking pools, assets..."
-            />
-          </div>
-        </div>
-      </header>
+      <ChainMarketHeader
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search staking pools, assets..."
+        mobileSearchPlaceholder="Search staking pools, assets..."
+        darkMode={darkMode}
+        onToggleTheme={() => setDarkMode((value) => !value)}
+        userEmail={user?.email ?? null}
+        showCart={false}
+      />
 
       {/* CONTENT */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
@@ -336,7 +190,7 @@ export default function StakingPage() {
           </h2>
 
           <p className={`mt-3 max-w-2xl ${theme.muted}`}>
-            ChainMarket nantinya menggabungkan ecommerce,
+            ChainMarket nantinya menggabungkan marketplace,
             crypto marketplace, dan staking dalam satu platform.
           </p>
         </div>

@@ -38,16 +38,6 @@ export default function ShippingAddressesPage() {
   const [form, setForm] = useState(emptyForm);
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("chain-market-theme");
-
-    if (savedTheme === "dark") {
-      setTheme("dark");
-    }
-
-    loadAddresses();
-  }, []);
-
   async function loadAddresses() {
     setLoading(true);
 
@@ -77,6 +67,16 @@ export default function ShippingAddressesPage() {
 
     setLoading(false);
   }
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("chain-market-theme");
+
+    if (savedTheme === "dark") {
+      setTheme("dark");
+    }
+
+    loadAddresses();
+  }, []);
 
   function updateField(
     field: keyof typeof emptyForm,
